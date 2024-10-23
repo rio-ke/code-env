@@ -1,0 +1,110 @@
+**Prerequisites**
+
+**Install JAVA**
+
+```cmd
+sudo apt-get update
+sudo apt-get install default-jre
+```
+** Install MySQL**
+
+```cmd
+sudo apt-get update
+sudo apt-get install mysql-server
+```
+**Create SonarQube Database and User**
+```sql
+CREATE DATABASE sonar CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER 'sonar'@'%' IDENTIFIED BY 'sonar';
+GRANT ALL PRIVILEGES ON sonar.* TO 'sonar'@'%' IDENTIFIED BY 'sonar';
+GRANT ALL PRIVILEGES ON sonar.* TO 'sonar'@'localhost' IDENTIFIED BY 'sonar';
+FLUSH PRIVILEGES;
+```
+
+**Install SonarQube**
+```cmd
+export SONAR_VERSION=  #add latest -version 
+```
+
+** Unzip SonarQube**
+
+```cmd
+wget http://dist.sonar.codehaus.org/sonarqube-${SONAR_VERSION}.zip
+unzip sonarqube-${SONAR_VERSION}.zip
+sudo mv sonarqube-${SONAR_VERSION} /opt/sonar
+```
+**Configure SonarQube**
+
+* we need to edit sonar.properties file
+
+```cmd
+sudo vim /opt/sonar/conf/sonar.properties
+```
+```ini
+sonar.jdbc.username=sonar
+sonar.jdbc.password=sonar
+sonar.jdbc.url=jdbc:mysql://localhost:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance
+sonar.web.host=127.0.0.1
+sonar.web.context=/sonar
+sonar.web.port=9000
+```
+* start sonar server or create sonar systemd service 
+```cmd
+sudo /opt/sonar/bin/linux-x86-64/sonar.sh start
+```
+**SonarQube Runner Installation**
+
+_Set the SonarQube Runner Version_
+
+```cmd
+export SONAR_RUNNER_VERSION= #lates
+```
+```cmd
+wget http://repo1.maven.org/maven2/org/codehaus/sonar/runner/sonar-runner-dist/${SONAR_RUNNER_VERSION}/sonar-runner-dist-${SONAR_RUNNER_VERSION}.zip
+unzip sonar-runner-dist-${SONAR_RUNNER_VERSION}.zip
+sudo mv sonar-runner-${SONAR_RUNNER_VERSION} /opt/sonar-runner
+```
+```cmd
+sudo vim /opt/sonar-runner/conf/sonar-runner.properties
+```
+```ini
+sonar.host.url=http://localhost:9000/sonar
+sonar.jdbc.url=jdbc:mysql://localhost:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance
+sonar.jdbc.username=sonar
+sonar.jdbc.password=sonar
+```
+
+**Set Environment Variables for pam**
+
+_Create or Edit `~/.pam_environment`_
+
+```bash
+sudo touch ~/.pam_environment
+sudo vim ~/.pam_environment
+```
+_Add the following lines_
+
+```ini
+SONAR_RUNNER_HOME=/opt/sonar-runner
+PATH DEFAULT=${PATH}:${SONAR_RUNNER_HOME}/bin
+```
+* Restart the SonarQube Server again.
+
+* Download the PHP plugin and place it in the extensions/plugins directory
+
+* wget the file and add it below location
+
+```cmd
+sudo mv downloaded-plugin.jar /opt/sonar/extensions/plugins/
+```
+* Restart the SonarQube Server again.
+
+**Running SonarQube Analysis on a Project**
+* Navigate to your project root directory.
+ * Run the SonarQube analysis:
+
+```cmd
+sonar-runner -Dsonar.host.url=http://localhost:9000/sonar -Dsonar.projectKey=rcms-org -Dsonar.projectName=rcms-org -Dsonar.projectVersion=1.0 -Dsonar.sources=./app -Dsonar.language=php -Dsonar.jdbc.url=jdbc:mysql://localhost:3306/sonar -Dsonar.jdbc.username=sonar -Dsonar.jdbc.password=sonar
+```
+
+
