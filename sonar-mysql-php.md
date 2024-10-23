@@ -1,4 +1,4 @@
-**Prerequisites**
+## SonarQube MYSQL PHP-App
 
 **Install JAVA**
 
