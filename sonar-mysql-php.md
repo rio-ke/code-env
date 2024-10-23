@@ -171,6 +171,8 @@ sudo mv downloaded-plugin.jar /opt/sonar/extensions/plugins/
 * Navigate to your project root directory.
  * Run the SonarQube analysis:
 
+* Navagate to sonar web page and create Project Name and Key
+
 ```cmd
 sonar-runner -Dsonar.host.url=http://localhost:9000/sonar -Dsonar.projectKey=rcms-org -Dsonar.projectName=rcms-org -Dsonar.projectVersion=1.0 -Dsonar.sources=./app -Dsonar.language=php -Dsonar.jdbc.url=jdbc:mysql://localhost:3306/sonar -Dsonar.jdbc.username=sonar -Dsonar.jdbc.password=sonar
 ```
