@@ -20,6 +20,66 @@ GRANT ALL PRIVILEGES ON sonar.* TO 'sonar'@'%' IDENTIFIED BY 'sonar';
 GRANT ALL PRIVILEGES ON sonar.* TO 'sonar'@'localhost' IDENTIFIED BY 'sonar';
 FLUSH PRIVILEGES;
 ```
+**Changes in MySQL Configuration**
+
+```ini
+innodb_buffer_pool_size = 2G       #Ram,we should give about above 60%
+innodb_log_file_size = 256M
+innodb_file_per_table = 1
+innodb_flush_log_at_trx_commit = 2
+max_connections = 300
+query_cache_size = 64M
+query_cache_type = 1
+wait_timeout = 300
+interactive_timeout = 300
+
+#Disable reverse DNS lookups
+skip-name-resolve
+```
+**Restart mysql**
+
+```cmd
+sudo systemctl restart mysql
+```
+**OS System Settings**
+* To prevent resource bottlenecks and ensure SonarQube runs smoothly, adjust your system settings by editing the /etc/sysctl.conf file.
+
+```cmd
+sudo vim /etc/sysctl.conf
+```
+* Some of the valuse are important so accarding 
+
+```ini
+fs.file-max = 65536
+
+# Virtual Memory Settings
+vm.max_map_count = 262144
+vm.swappiness = 10
+
+# Network Stack Tuning
+net.core.somaxconn = 4096
+net.ipv4.tcp_max_syn_backlog = 2048
+net.ipv4.tcp_fin_timeout = 15
+
+# Shared Memory Settings
+kernel.shmmax = 68719476736
+kernel.shmall = 4294967296
+```
+
+```cmd
+sudo sysctl -p
+```
+**Linux Limits Configuration**
+
+```cmd
+sudo vim /etc/security/limits.conf
+```
+```ini
+sonar   soft    nofile   65536
+sonar   hard    nofile   65536
+sonar   soft    nproc    4096
+sonar   hard    nproc    8192
+```
 
 **Install SonarQube**
 ```cmd
