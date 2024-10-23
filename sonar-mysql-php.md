@@ -44,10 +44,18 @@ sudo vim /opt/sonar/conf/sonar.properties
 sonar.jdbc.username=sonar
 sonar.jdbc.password=sonar
 sonar.jdbc.url=jdbc:mysql://localhost:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance
-sonar.web.host=127.0.0.1
+sonar.web.host=127.0.0.1 # or 0.0.0.0
 sonar.web.context=/sonar
-sonar.web.port=9000
+sonar.web.port=9000 # chage the port, not defult
 ```
+**Memory Settings**
+* To avoid memory issues and improve performance, increase the heap memory allocation by adding these properties (depending on the available system memory)
+```ini
+sonar.web.javaOpts=-Xms512m -Xmx2048m -XX:+HeapDumpOnOutOfMemoryError
+sonar.ce.javaOpts=-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError
+sonar.search.javaOpts=-Xms512m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError
+```
+
 * start sonar server or create sonar systemd service 
 ```cmd
 sudo /opt/sonar/bin/linux-x86-64/sonar.sh start
